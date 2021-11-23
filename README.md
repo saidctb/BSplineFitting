@@ -4,7 +4,7 @@ This algorithm aims at describing a given curve from hand sketches using a B-Spl
 
 The algorithm consists of two parts:
 
-- **\[Completed\] **Given a fixed number of control points, solve for the optimization problem so that the reconstruction error is minimized by placing the control points.
+- **\[Completed\]** Given a fixed number of control points, solve for the optimization problem so that the reconstruction error is minimized by placing the control points.
     - Use the method **splprep()** in **scipy** package for stability.
     - While the package itself did not provide a handle controlling the number of control points, designing the knot vector based on curve types can produce desired number of control points.
     - Compatible for both open and closed curves.
