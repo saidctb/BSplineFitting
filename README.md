@@ -26,7 +26,7 @@ So far the workflow for the second part has been successfully created and initia
 - Construct the training and validation process and check the models' performance when trained with different types of curves (e.g. open curves only, closed curves only, and both open and closed curves)
 - Use the trained model to predict the number of control points given a numpy.ndarray representing the sampled curve from the sketch interface.
 
-## Works to be done
+## Work to be done
 
 Further improvements are required since the current model is not working well on the validation dataset. Possible future works are as follows.
 
