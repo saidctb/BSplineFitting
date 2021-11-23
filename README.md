@@ -17,7 +17,7 @@ The algorithm consists of two parts:
 
 ## Completed work
 
-So far the workflow for the second part has been successfully created and initialized. The completed works are as follows.
+Besides the completed first part, so far the workflow for the second part has been successfully created and initialized. The completed works are as follows.
 
 - Compute knot vectors for both open and closed curves.
 - Sample control points of different numbers.
@@ -25,6 +25,8 @@ So far the workflow for the second part has been successfully created and initia
 - Build a complex model similar to ResNet-18 and a relatively simple  and straight forward model to compare the performances
 - Construct the training and validation process and check the models' performance when trained with different types of curves (e.g. open curves only, closed curves only, and both open and closed curves)
 - Use the trained model to predict the number of control points given a numpy.ndarray representing the sampled curve from the sketch interface.
+
+For more details about this whole algorithm and how I conducted the literature review and decided to work on this problem, refer to the weekly reports in the folder **Reports**.
 
 ## Work to be done
 
