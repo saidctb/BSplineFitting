@@ -34,7 +34,7 @@ def evaluate(net, epoch_no, dataloader, curve_type, model_type):
         criterion = nn.CrossEntropyLoss()
         # Get the predictions
         num_batches = 0
-        running_loss = 0
+        running_loss = 0.0
         for idx, data in enumerate(dataloader):
             imgs, imgs_n = data
             imgs = imgs.to(device)

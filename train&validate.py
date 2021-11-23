@@ -82,7 +82,7 @@ def train(net, num_epoch, train_dataloader, val_dataloader, curve_type, model_ty
         # Evaluate the trained model
         acc, val_loss, _, _ = evaluate(net, epoch + 1, val_dataloader, curve_type, model_type)
         print("\n[epoch:%d] Validation Loss: %.5f" % (epoch + 1, val_loss))
-        val_loss_list.append(loss_list)
+        val_loss_list.append(val_loss)
         print("\n[epoch:%d] Validation Accuracy: %.5f" % (epoch + 1, acc))
         acc_list.append(acc)
     # Save the trained model
