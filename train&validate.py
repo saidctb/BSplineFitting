@@ -47,6 +47,10 @@ def train(net, num_epoch, train_dataloader, val_dataloader, curve_type, model_ty
     if model_type not in ['simple', 'complex']:
         raise ValueError('Wrong model type is provided')
     print('Start training the ' + model_type + ' model for ' + curve_type + ' curves')
+    # Path for saving the trained model
+    model_root_path = '.\\Model\\' + model_type + '\\' + curve_type + '\\'
+    if not os.path.exists(model_root_path):
+        os.makedirs(model_root_path)
     # Initialize the parameters
     net.apply(init_weights)
     # Check available devices
@@ -85,11 +89,8 @@ def train(net, num_epoch, train_dataloader, val_dataloader, curve_type, model_ty
         val_loss_list.append(val_loss)
         print("\n[epoch:%d] Validation Accuracy: %.5f" % (epoch + 1, acc))
         acc_list.append(acc)
-    # Save the trained model
-    model_root_path = '.\\Model\\' + model_type + '\\' + curve_type + '\\'
-    if not os.path.exists(model_root_path):
-        os.makedirs(model_root_path)
-    torch.save(Net.state_dict(), model_root_path + 'SplineNet' + str(num_epoch) + '.pth')
+        # Save the trained model
+        torch.save(Net.state_dict(), model_root_path + 'SplineNetv.pth')
     # Plot the training loss
     figure_root_path = '.\\Figure\\' + model_type + '\\' + curve_type + '\\'
     fig, ax = plt.subplots(figsize=(10, 6), dpi=100)
