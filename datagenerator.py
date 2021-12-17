@@ -36,6 +36,75 @@ def get_knots(n: int, p: int = 3, cl: bool = False) -> np.ndarray:
     return knots
 
 
+def point_to_line(p: np.ndarray, q1: np.ndarray, q2: np.ndarray) -> float:
+    """
+    :param p: Independent point
+    :param q1: First point on the line
+    :param q2: Second point on the line
+    :return: The distance between the point and the line
+    """
+    # Compute the distance via square area
+    vec1 = q1 - p
+    vec2 = q2 - p
+    vec3 = q1 - q2
+    dis = np.abs(np.cross(vec1, vec2)) / np.sqrt(vec3.dot(vec3))
+    return dis
+
+
+def unwanted_features(p1: np.ndarray, p2: np.ndarray, q1: np.ndarray, q2: np.ndarray) -> bool:
+    """
+    :param p1: Start point of first line
+    :param p2: End point of first line
+    :param q1: Start point of second line
+    :param q2: End point of second line
+    :return: Whether the two lines have unwanted features
+    """
+    # Direction vector of each line
+    v1 = p2 - p1
+    v2 = q2 - q1
+    # Length of each line
+    l1 = np.sqrt(v1.dot(v1))
+    l2 = np.sqrt(v2.dot(v2))
+    # Compute the included angle between lines
+    theta = np.arccos(v1.dot(v2) / (l1*l2))
+    # If parallel, check the distances between points
+    if np.abs(theta) <= 1e-3 or np.abs(theta-np.pi) <= 1e-3:
+        # Compute the distances between points and lines
+        dis1 = point_to_line(p1, q1, q2)
+        dis2 = point_to_line(p2, q1, q2)
+        # If too close, view the lines as collinear
+        if min(dis1, dis2) <= 0.0015:
+            return True
+        # Otherwise, parallel lines will not have unwanted features
+        else:
+            return False
+    # If no parallel, check intersections
+    else:
+        s = (- v1[1] * (p1[0] - q1[0]) + v1[0] * (p1[1] - q1[1])) / (
+             - v2[0] * v1[1] + v1[0] * v2[1])
+        t = (v2[0] * (p1[1] - q1[1]) - v2[1] * (p1[0] - q1[0])) / (
+             - v2[0] * v1[1] + v1[0] * v2[1])
+        if 0 <= s <= 1 and 0 <= t <= 1:
+            # int = p1 + t * v1
+            return True
+        else:
+            return False
+
+
+def strange_shape(cofs: np.ndarray) -> bool:
+    """
+    :param cofs: A polyline consisting of control points
+    :return: Check if the polyline form a strange shape
+    """
+    # Number of straight lines
+    line_num = cofs.shape[0] - 1
+    for ii in range(line_num-2):
+        for jj in range(ii+2, line_num):
+            if unwanted_features(cofs[ii, :], cofs[ii+1, :], cofs[jj, :], cofs[jj+1, :]):
+                return True
+    return False
+
+
 def get_cofs(n: int, p: int = 3, cl: bool = False) -> np.ndarray:
     """
     :param n: Number of control points
@@ -43,24 +112,42 @@ def get_cofs(n: int, p: int = 3, cl: bool = False) -> np.ndarray:
     :param cl: Whether for a closed curve, default is false
     :return: Positions of a random created set of control points
     """
-    # Start from the origin
-    cofs = list()
-    cofs.append(np.array([0, 0]))
-    # Randomly select a direction and distance
-    theta = (2 * np.random.rand(1) - 1) * np.pi
-    length = 1 + np.random.rand(1)
-    # Place the second control point
-    step = np.squeeze(np.array([length * np.cos(theta), length * np.sin(theta)]))
-    cofs.append(cofs[0] + step)
-    # Loop for placing the rest control points
-    for ii in range(1, n - 1):
-        # Randomly select a direction so that the angle between the new direction and the old direction is less than
-        # 90 degrees, then randomly select a distance between control points
-        theta = theta + (np.random.rand(1) - 0.5) * np.pi
-        length = 1 + np.random.rand(1)
-        # Place the next control point
-        step = np.squeeze(np.array([length * np.cos(theta), length * np.sin(theta)]))
-        cofs.append(cofs[ii] + step)
+    exit_flag = False
+    while not exit_flag:
+        cofs = list()
+        # Sample control points for closed curves
+        if cl:
+            # Check number of control points for closed curves
+            assert n >= 3, 'At least three control points are needed for closed curves'
+            # Sample by disturbing regular polygons
+            theta_n = 2 * np.pi / n
+            for ii in range(n):
+                theta = (ii + 0.4 * np.random.rand(1) - 0.2) * theta_n
+                length = 1 + 0.5 * np.random.randn(1)
+                step = np.squeeze(np.array([length * np.cos(theta), length * np.sin(theta)]))
+                cofs.append(step)
+        # Sample control points for open curves
+        else:
+            # Start from the origin
+            cofs.append(np.array([0, 0]))
+            # Randomly select a direction and distance
+            theta = (2 * np.random.rand(1) - 1) * np.pi
+            length = 1 + 0.5 * np.random.randn(1)
+            # Place the second control point
+            step = np.squeeze(np.array([length * np.cos(theta), length * np.sin(theta)]))
+            cofs.append(cofs[0] + step)
+            # Loop for placing the rest control points
+            for ii in range(1, n - 1):
+                # Randomly select a direction by sampling the angle between the new direction and the old direction,
+                # then randomly sample a distance between control points
+                theta = theta + np.random.choice([-1, 1]) * (0.5 * np.random.rand(1) + 1 / 6) * np.pi
+                length = 1 + 0.25 * np.random.randn(1)
+                # Place the next control point
+                step = np.squeeze(np.array([length * np.cos(theta), length * np.sin(theta)]))
+                cofs.append(cofs[ii] + step)
+        # Check whether the polyline form a strange shape
+        if not strange_shape(np.array(cofs)):
+            exit_flag = True
     # Wrap the first p and last p control points for closed curves
     if cl:
         for ii in range(p):
