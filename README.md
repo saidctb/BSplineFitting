@@ -35,17 +35,25 @@ Further improvements are required since the current model is not working well on
   - Improve the generated dataset
       - Make curves controlled by different number of control points more distinct
       - Make the distribution of sampled curves more rational and similar to real drawings
-  - Train the complex model with a dataset bigger in size to avoid overfitting.
+  - Train the complex model with a bigger dataset to avoid overfitting.
   - Modify the model structure and hyperparameters for better performance.
 
 ## Current performance
 
 The figures showing the performance of current models are in the **Figure** folder.
 
-- Two folders **complex** and **simple** indicating which model is evaluated
+- Two folders **complex** and **simple** indicating which model is evaluated.
 - In **complex** and **simple**, three folders **open**, **closed** and **all** indicating which type of curves are fed into the model in training process.
 - The confusion matrix on validation dataset  after each epoch is listed.
 - The plots of training loss, validation loss and validation accuracy are included.
+
+## Recent Updates
+
+**Dec.17th**
+
+- Updated the algorithm of checking control points to avoid most self-intersection splines.
+- Changed the way of sampling control points for closed curves.
+- Trained the simple model with newly generated dataset. The results are updated in the **Figure** folder.
 
 # How to use
 
